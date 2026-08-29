@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>콘텐츠 라벨 프로토타입 · 과목/과정 (개발 참고용)</title>
+<style>
+  :root{
+    --bg:#eef0f3; --panel:#fff; --line:#dcdfe4; --line2:#e8eaee;
+    --head:#f4f6f8; --labelbg:#f7f8fa; --ink:#222; --muted:#6b7280;
+    --link:#1a5fb4; --primary:#dc2f3e; --primary-d:#c02534;
+    --new:#f59e0b; --new-bg:#fff8ec; --new-line:#f4c56b;
+    /* 콘텐츠 라벨 배지 (기획서 4-1) */
+    --lb-none:#9CA3AF; --lb-general:#2563EB; --lb-specific:#16A34A;
+    --lb-client:#EA580C; --lb-closed:#DC2626;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo',sans-serif;font-size:13px;line-height:1.5}
+  a{color:var(--link);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ===== 상단 바 ===== */
+  .topbar{position:sticky;top:0;z-index:50;background:#20242c;color:#fff;
+    padding:10px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .topbar h1{font-size:14px;margin:0;font-weight:700;letter-spacing:.2px}
+  .topbar .doc{font-size:12px;color:#aeb4bf}
+  .topbar .doc b{color:#fff}
+  .legend{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;color:#c8ccd3}
+  .legend .swatch{display:inline-block;width:14px;height:14px;border-radius:3px;
+    background:var(--new-bg);border:2px solid var(--new);vertical-align:-2px;margin-right:5px}
+  .legend label{cursor:pointer;user-select:none}
+
+  /* ===== 탭 ===== */
+  .tabs{display:flex;gap:2px;background:#2b303a;padding:0 12px;flex-wrap:wrap;position:sticky;top:41px;z-index:49}
+  .tab{padding:9px 14px;color:#c2c7d0;cursor:pointer;font-size:12.5px;border-bottom:3px solid transparent}
+  .tab:hover{color:#fff}
+  .tab.active{color:#fff;border-bottom-color:var(--primary);background:#20242c;font-weight:700}
+  .tab .grp{color:#7f8794;font-size:11px;margin-right:4px}
+
+  .wrap{max-width:1240px;margin:18px auto;padding:0 16px 60px}
+  .screen{display:none}
+  .screen.active{display:block}
+
+  /* ===== 페이지 헤더 ===== */
+  .pagehead{display:flex;align-items:center;justify-content:space-between;margin:6px 0 12px}
+  .pagehead .ttl{font-size:16px;font-weight:800;padding-left:12px;position:relative}
+  .pagehead .ttl::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:4px;background:#20242c;border-radius:2px}
+  .pagehead .code{color:var(--muted);font-weight:600;font-size:13px}
+  .help{border:1px solid #444;background:#2b303a;color:#fff;border-radius:4px;padding:4px 10px;font-size:11px}
+
+  /* ===== 변경사항 안내 패널 ===== */
+  .changes{background:var(--new-bg);border:1px solid var(--new-line);border-left:4px solid var(--new);
+    border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:12.5px}
+  .changes b{color:#a55a00}
+  .changes ul{margin:6px 0 0;padding-left:18px}
+  .changes li{margin:2px 0}
+  .changes .ref{color:var(--muted);font-size:11px}
+
+  /* ===== 카드/필터 ===== */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;margin-bottom:14px}
+  .filter{padding:14px}
+  table.frm{width:100%;border-collapse:collapse}
+  table.frm td,table.frm th{border:1px solid var(--line2);padding:7px 10px;vertical-align:middle}
+  table.frm th,td.lbl{background:var(--labelbg);font-weight:700;white-space:nowrap;width:120px;text-align:left;color:#374151}
+  .frm input[type=text],.frm select,.frm input.txt{height:28px;border:1px solid #c8ccd3;border-radius:3px;padding:0 7px;font-size:12.5px;background:#fff}
+  .frm select{min-width:120px}
+  .frm .full{width:100%}
+  .frm .w160{width:160px}.frm .w120{width:120px}.frm .w90{width:90px}
+  .chk{vertical-align:-2px;margin-right:4px}
+
+  .actions{display:flex;justify-content:center;gap:8px;padding:12px;border-top:1px solid var(--line2)}
+  .btn{border:1px solid #c8ccd3;background:#fff;border-radius:4px;padding:7px 16px;font-size:12.5px;cursor:pointer;color:#333}
+  .btn:hover{background:#f3f4f6}
+  .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
+  .btn.primary:hover{background:var(--primary-d)}
+  .btn.sm{padding:5px 10px;font-size:11.5px}
+
+  /* ===== 목록 툴바 ===== */
+  .listbar{display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px;flex-wrap:wrap;gap:8px}
+  .count{font-size:13px}.count b{color:var(--primary);font-weight:800}
+  .toolbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .toolbtns .btn{background:#f7f8fa}
+
+  /* ===== 데이터 테이블 ===== */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:#fff}
+  table.grid{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+  table.grid th,table.grid td{border:1px solid var(--line2);padding:8px 8px;text-align:center;white-space:nowrap}
+  table.grid thead th{background:var(--head);color:#374151;font-weight:700}
+  table.grid tbody tr:hover{background:#fafbfc}
+  table.grid td.name{text-align:left;white-space:normal;min-width:280px}
+  table.grid a.subj{color:var(--link);font-weight:600}
+
+  /* ===== 콘텐츠 라벨 배지 ===== */
+  .badge{display:inline-block;color:#fff;font-size:11px;font-weight:700;line-height:1;
+    padding:3px 8px;border-radius:4px;margin-right:6px;vertical-align:1px;white-space:nowrap}
+  .badge.none{background:var(--lb-none)}
+  .badge.general{background:var(--lb-general)}
+  .badge.specific{background:var(--lb-specific)}
+  .badge.client{background:var(--lb-client)}
+  .badge.closed{background:var(--lb-closed)}
+
+  /* ===== 신규/변경 강조 ===== */
+  .is-new{position:relative;background:var(--new-bg)!important}
+  .is-new::after{content:"추가";position:absolute;top:-8px;right:6px;background:var(--new);color:#fff;
+    font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.3px}
+  td.is-new,th.is-new{outline:2px solid var(--new);outline-offset:-2px}
+  .col-new{outline:2px solid var(--new);outline-offset:-2px;background:var(--new-bg)!important;position:relative}
+  body.hideHL .is-new{background:transparent!important}
+  body.hideHL .is-new::after{display:none}
+  body.hideHL td.is-new,body.hideHL th.is-new,body.hideHL .col-new{outline:none;background:transparent!important}
+  .newtag{display:inline-block;background:var(--new);color:#fff;font-size:9.5px;font-weight:700;
+    padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:1px}
+  body.hideHL .newtag{display:none}
+
+  .req{color:var(--primary);font-weight:800;margin-left:2px}
+  .hint{color:var(--muted);font-size:11px;margin-top:3px}
+  .disabled{background:#f1f2f4!important;color:#888}
+
+  /* ===== 기업검색 모달 ===== */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+  .modal-bg.on{display:flex}
+  .modal{background:#fff;border-radius:8px;width:440px;max-width:92vw;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+  .modal .mh{background:#20242c;color:#fff;padding:11px 16px;font-weight:700;font-size:13px;display:flex;justify-content:space-between}
+  .modal .mh span{cursor:pointer}
+  .modal .mb{padding:14px 16px}
+  .modal .srow{display:flex;gap:6px;margin-bottom:10px}
+  .modal .srow input{flex:1;height:30px;border:1px solid #c8ccd3;border-radius:4px;padding:0 8px}
+  .modal table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .modal th,.modal td{border:1px solid var(--line2);padding:7px 8px;text-align:left}
+  .modal th{background:var(--head)}
+  .modal tbody tr{cursor:pointer}
+  .modal tbody tr:hover{background:var(--new-bg)}
+
+  .footnote{color:var(--muted);font-size:11.5px;margin-top:26px;border-top:1px dashed var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>콘텐츠 라벨 · 개발 참고용 프로토타입</h1>
+  <span class="doc">기획서: <b>[260829] 과목/과정 - 콘텐츠 라벨</b></span>
+  <div class="legend">
+    <span><span class="swatch"></span>이번 개발 추가/변경 요소</span>
+    <label><input type="checkbox" id="hlToggle" checked onchange="document.body.classList.toggle('hideHL',!this.checked)"> 강조 표시</label>
+  </div>
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-s="s1"><span class="grp">과목</span>① 목록</div>
+  <div class="tab" data-s="s2"><span class="grp">과목</span>② 등록</div>
+  <div class="tab" data-s="s3"><span class="grp">과목</span>③ 조회</div>
+  <div class="tab" data-s="s4"><span class="grp">과정</span>④ 목록</div>
+  <div class="tab" data-s="s5"><span class="grp">과정</span>⑤ 등록</div>
+  <div class="tab" data-s="s6"><span class="grp">과정</span>⑥ 조회</div>
+</div>
+
+<div class="wrap">
+
+<!-- ============================================================ 1. 과목 목록 -->
+<section class="screen active" id="s1">
+  <div class="pagehead">
+    <div class="ttl">과목현황 <span class="code">(0201-A01)</span></div>
+    <div class="help">도움말</div>
+  </div>
+  <div class="changes">
+    <b>이 화면 변경사항</b> <span class="ref">(기획서 4-2-1)</span>
+    <ul>
+      <li>검색 필터에 <b>‘콘텐츠라벨’ 드롭다운</b> 추가 (전체 / 미지정 / 범용 / 특정사 / 고객사자체 / 폐강)</li>
+      <li>목록 <b>‘과목명’ 앞에 콘텐츠라벨 배지</b> 표기</li>
+    </ul>
+  </div>
+
+  <div class="card filter">
+    <table class="frm">
+      <tr>
+        <td class="lbl">과목명</td>
+        <td><select class="w120"><option>과목명</option></select> <input type="text" class="w160"></td>
+        <td class="lbl">사용여부</td><td><select class="w120"><option>Y</option><option>N</option></select></td>
+        <td class="lbl">카테고리</td><td><select class="w120"><option>[카테고리]</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">과목구분</td><td><select class="w120"><option>[과목구분]</option></select></td>
+        <td class="lbl">과목유형</td><td><select class="w120"><option>[과목유형]</option></select></td>
+        <td class="lbl">CP사</td><td><select class="w120"><option>[CP]</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">제작사</td><td><select class="w120"><option>[제작사]</option></select></td>
+        <td class="lbl">교안유무</td><td><select class="w120"><option>[교안유무]</option></select></td>
+        <td class="lbl">환급가능여부</td><td><select class="w120"><option>[환급가능여부]</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">튜터유무</td><td><select class="w120"><option>[튜터유무]</option></select></td>
+        <td class="lbl">등록일</td><td><input type="text" class="w120" placeholder="YYYYMMDD"> ~ <input type="text" class="w120" placeholder="YYYYMMDD"></td>
+        <td class="lbl">컨텐츠창 챗봇</td><td><select class="w120"><option>전체</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl is-new">콘텐츠라벨</td>
+        <td class="is-new">
+          <select class="w120" id="s1label">
+            <option value="all">전체</option>
+            <option value="none">미지정</option>
+            <option value="general">범용</option>
+            <option value="specific">특정사</option>
+            <option value="client">고객사자체</option>
+            <option value="closed">폐강</option>
+          </select>
+        </td>
+        <td class="lbl">추가 조건</td>
+        <td colspan="3"><input type="checkbox" class="chk" checked>러닝메이커 제외</td>
+      </tr>
+    </table>
+    <div class="actions" style="border-top:none">
+      <button class="btn primary" onclick="filterSubjects()">🔍 검색</button>
+      <button class="btn" onclick="document.getElementById('s1label').value='all';filterSubjects()">초기화</button>
+    </div>
+  </div>
+
+  <div class="listbar">
+    <div class="count"><b id="s1count">98,763</b> 건의 자료가 검색되었습니다.</div>
+    <div class="toolbtns">
+      <button class="btn sm">기수과목일괄업데이트</button>
+      <button class="btn sm">업체 일괄 변경</button>
+      <button class="btn sm">과목/과정정보 일괄수정</button>
+      <button class="btn sm">과목정보 일괄수정</button>
+      <button class="btn sm">과목이미지 일괄등록</button>
+      <button class="btn sm">과목등록</button>
+      <button class="btn sm">xls다운</button>
+      <button class="btn sm">교안정보다운</button>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="grid">
+      <thead><tr>
+        <th>NO</th><th>과목코드</th><th>사용과정코드</th><th>과목구분</th><th>과목유형</th>
+        <th>과목명</th><th>사용여부</th><th>CP사</th><th>수강료(일반)</th><th>수강료(평생골드)</th><th>등록일</th>
+      </tr></thead>
+      <tbody id="s1rows"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ 2. 과목 등록 -->
+<section class="screen" id="s2">
+  <div class="pagehead">
+    <div class="ttl">과목기본정보등록 <span class="code">(0201-A02)</span></div>
+    <div class="help">도움말</div>
+  </div>
+  <div class="changes">
+    <b>이 화면 변경사항</b> <span class="ref">(기획서 4-2-2)</span>
+    <ul>
+      <li><b>‘콘텐츠라벨’ 항목 추가</b> — 위치: 기존 <b>‘모바일 노출 여부’ 하단 행</b> · 드롭다운 · 필수</li>
+      <li>조건: 콘텐츠라벨 = <b>특정사 OR 고객사자체</b> → <b>과목 사용기간(기존) + 기업코드(기존 ‘고객사 과정 유형’) 필수</b></li>
+      <li>특정사 선택 시 고객사 과정 유형 <b>[자체개발]</b> 자동, 고객사자체 선택 시 <b>[커스터마이징]</b> 자동</li>
+    </ul>
+  </div>
+
+  <div class="card filter">
+    <table class="frm">
+      <tr>
+        <td class="lbl">카테고리</td><td><select class="w120"><option>[카테고리]</option></select></td>
+        <td class="lbl">CP</td><td><select class="w120"><option>[CP]</option></select></td>
+        <td class="lbl">과목구분</td><td><select class="w120"><option>[과목구분]</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">제작년월</td><td><select class="w90"><option>2026</option></select> 년 <select class="w90"><option>8</option></select> 월</td>
+        <td class="lbl is-new" id="s2periodLbl">과목 사용기간<span class="req" id="s2periodReq" style="display:none">*</span></td>
+        <td class="is-new"><input type="text" class="w160" id="s2period" placeholder="예: 20260101-20261231"></td>
+        <td class="lbl">진도순차여부</td><td><select class="w90"><option>순차</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">과목유형</td>
+        <td colspan="5">
+          <label><input type="radio" name="s2type" class="chk" checked>포팅과정</label>
+          <label><input type="radio" name="s2type" class="chk">신규 모듈화과정</label>
+          <label><input type="radio" name="s2type" class="chk">저작과정(모듈화)</label>
+          <label><input type="radio" name="s2type" class="chk">HTML5 일반</label>
+          <label><input type="radio" name="s2type" class="chk">스마트패스</label>
+          <label><input type="radio" name="s2type" class="chk">도서학습</label>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">모바일 노출 여부</td>
+        <td colspan="5"><select class="w90"><option>Y</option><option>N</option></select></td>
+      </tr>
+      <!-- ▼▼▼ 신규 추가 행: 콘텐츠라벨 (모바일 노출 여부 하단) ▼▼▼ -->
+      <tr>
+        <td class="lbl is-new">콘텐츠라벨<span class="req">*</span></td>
+        <td class="is-new" colspan="5">
+          <select class="w160" id="s2label" onchange="s2onLabel()">
+            <option value="">선택</option>
+            <option value="none">미지정</option>
+            <option value="general">범용</option>
+            <option value="specific">특정사</option>
+            <option value="client">고객사자체</option>
+            <option value="closed">폐강</option>
+          </select>
+          <span id="s2badge"></span>
+          <div class="hint">필수 입력. 특정사·고객사자체 선택 시 아래 ‘고객사 과정 유형’과 위 ‘과목 사용기간’이 필수로 전환됩니다.</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">사업유형(ERP)</td>
+        <td colspan="2"><select class="w120"><option>[1Depth]</option></select> <select class="w120"><option>[2Depth]</option></select></td>
+        <td class="lbl" id="s2cvtLbl">고객사 과정 유형<span class="req" id="s2cvtReq" style="display:none">*</span></td>
+        <td colspan="2" class="" id="s2cvtCell">
+          <select class="w120" id="s2cvt">
+            <option value="">해당없음</option>
+            <option value="self">자체개발</option>
+            <option value="custom">커스터마이징</option>
+          </select>
+          <input type="text" class="w120" id="s2corp" placeholder="기업코드">
+          <button class="btn sm" onclick="openCompany('s2corp')">검색</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">과목명</td>
+        <td colspan="5"><input type="text" class="full" style="max-width:420px"></td>
+      </tr>
+      <tr>
+        <td class="lbl">영문과목명</td>
+        <td colspan="5"><input type="text" class="full" style="max-width:420px"></td>
+      </tr>
+    </table>
+    <div class="actions" style="border-top:none">
+      <button class="btn primary" onclick="s2submit()">등록</button>
+      <button class="btn">취소</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 3. 과목 조회 -->
+<section class="screen" id="s3">
+  <div class="pagehead">
+    <div class="ttl">과목기본정보 <span class="code">(0201-A03)</span></div>
+    <div class="help">도움말</div>
+  </div>
+  <div class="changes">
+    <b>이 화면 변경사항</b> <span class="ref">(기획서 4-2-3 · 4-2-4)</span>
+    <ul>
+      <li><b>‘콘텐츠라벨’ 항목 추가(조회 전용)</b> — 위치: 기존 <b>‘영문과목명’ 하단 행</b> · 배지로 표기</li>
+      <li>수정 화면에서는 <b>미노출</b> (개별 수정 불가 — 컨텐츠매니지먼트팀 비정형통계로만 수정)</li>
+    </ul>
+  </div>
+
+  <div class="listbar" style="justify-content:flex-end">
+    <div class="toolbtns">
+      <button class="btn sm">교육비/환급비관리</button><button class="btn sm">도서정보</button>
+      <button class="btn sm">목차정보</button><button class="btn sm">과제정보</button>
+      <button class="btn sm">시험문항정보</button><button class="btn sm">토론정보</button>
+      <button class="btn sm">강사정보</button><button class="btn sm">튜터정보</button>
+    </div>
+  </div>
+
+  <div class="card filter">
+    <table class="frm">
+      <tr><td class="lbl">카테고리</td><td colspan="3">과목카테고리 &gt; 경영 &gt; 경영직무 &gt; 경영/전략</td></tr>
+      <tr><td class="lbl">CP</td><td>고객사(B2B)</td><td class="lbl">고객사 과정 유형</td><td>해당없음</td></tr>
+      <tr><td class="lbl">과목코드</td><td colspan="3">HLAC32494</td></tr>
+      <tr><td class="lbl">과목명</td><td colspan="3">약물감시의 이해와 임직원의 이상사례 보고(NEW)</td></tr>
+      <tr><td class="lbl">영문과목명</td><td colspan="3">&nbsp;</td></tr>
+      <!-- ▼ 신규 조회 항목 (영문과목명 하단) ▼ -->
+      <tr>
+        <td class="lbl is-new">콘텐츠라벨</td>
+        <td class="is-new" colspan="3"><span class="badge specific">특정사</span>
+          <span class="hint">조회 전용 · 등록 시 입력된 값 호출</span></td>
+      </tr>
+      <tr><td class="lbl">과목구분</td><td colspan="3">온라인</td></tr>
+      <tr><td class="lbl">사용과정코드</td><td colspan="3">HLAP32543</td></tr>
+      <tr><td class="lbl">제작사</td><td colspan="3">T3(티쓰리)</td></tr>
+      <tr><td class="lbl">사업유형</td><td colspan="3">온라인 &gt; 단과 &gt; 단과</td></tr>
+      <tr><td class="lbl">제작년월</td><td>2026-08</td><td class="lbl">과목 사용 기간</td><td>&nbsp;</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ 4. 과정 목록 -->
+<section class="screen" id="s4">
+  <div class="pagehead">
+    <div class="ttl">과정현황 <span class="code">(0202-A01)</span></div>
+    <div class="help">도움말</div>
+  </div>
+  <div class="changes">
+    <b>이 화면 변경사항</b> <span class="ref">(기획서 4-3-1)</span>
+    <ul>
+      <li>검색 필터에 <b>‘콘텐츠라벨’ 드롭다운</b> 추가</li>
+      <li>목록 <b>‘과정명’ 앞에 콘텐츠라벨 배지</b> 표기 —
+        <b>단과</b>는 연결된 ‘과목’의 라벨 호출 / <b>종합</b>은 과정 자체 입력값 호출</li>
+    </ul>
+  </div>
+
+  <div class="card filter">
+    <table class="frm">
+      <tr>
+        <td class="lbl">과정명</td>
+        <td><select class="w120"><option>과정명</option></select> <input type="text" class="w160"></td>
+        <td class="lbl">사용여부</td><td><select class="w90"><option>Y</option></select></td>
+        <td class="lbl">범용여부</td><td><select class="w90"><option>전체</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">매출구분</td><td><select class="w120"><option>선택</option></select></td>
+        <td class="lbl">과정구분</td><td><select class="w120"><option>선택</option></select></td>
+        <td class="lbl">과정유형</td><td><select class="w120"><option>선택</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">과정형태</td><td><select class="w90"><option>선택</option><option>단과</option><option>종합</option></select></td>
+        <td class="lbl">교재유무</td><td><select class="w120"><option>[교재유무]</option></select></td>
+        <td class="lbl">난이도</td><td><select class="w120"><option>[난이도]</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl is-new">콘텐츠라벨</td>
+        <td class="is-new">
+          <select class="w120" id="s4label">
+            <option value="all">전체</option>
+            <option value="none">미지정</option>
+            <option value="general">범용</option>
+            <option value="specific">특정사</option>
+            <option value="client">고객사자체</option>
+            <option value="closed">폐강</option>
+          </select>
+        </td>
+        <td class="lbl">등록일</td>
+        <td colspan="3"><input type="text" class="w120" placeholder="YYYYMMDD"> ~ <input type="text" class="w120" placeholder="YYYYMMDD"></td>
+      </tr>
+    </table>
+    <div class="actions" style="border-top:none">
+      <button class="btn primary" onclick="filterCourses()">🔍 검색</button>
+      <button class="btn" onclick="document.getElementById('s4label').value='all';filterCourses()">초기화</button>
+    </div>
+  </div>
+
+  <div class="listbar">
+    <div class="count"><b id="s4count">119,512</b> 건의 자료가 검색되었습니다.</div>
+    <div class="toolbtns">
+      <button class="btn sm">비환급 일괄전환</button>
+      <button class="btn sm">과정정보 일괄수정</button>
+      <button class="btn sm">종합과정기수복사등록</button>
+      <button class="btn sm">기수과목 비환급 전환</button>
+      <button class="btn sm">기수과정명 일괄 변경</button>
+      <button class="btn sm">과정등록</button>
+      <button class="btn sm">xls다운</button>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="grid">
+      <thead><tr>
+        <th>번호</th><th>과정코드</th><th>단과과목코드</th><th>과정형태</th><th>과정명</th>
+        <th>교재여부</th><th>사용여부</th><th>학습기간</th><th>수강료(일반)</th><th>수강료(골드)</th><th>등록일</th>
+      </tr></thead>
+      <tbody id="s4rows"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ 5. 과정 등록 -->
+<section class="screen" id="s5">
+  <div class="pagehead">
+    <div class="ttl">과정등록 <span class="code">(0202-A02)</span></div>
+    <div class="help">도움말</div>
+  </div>
+  <div class="changes">
+    <b>이 화면 변경사항</b> <span class="ref">(기획서 4-3-2)</span>
+    <ul>
+      <li>★ <b>과정형태 = [종합]</b> 선택 시에만 아래 항목 노출</li>
+      <li><b>‘콘텐츠라벨’ 추가</b> — 위치: 기존 <b>‘과정유형’ 하단 행</b> · 드롭다운 · 필수</li>
+      <li>조건: 특정사 OR 고객사자체 → <b>‘과정 사용기간’(숫자·하이픈만) + ‘사용 기업 코드’(검색 팝업) 추가·필수</b></li>
+    </ul>
+  </div>
+
+  <div class="card filter">
+    <table class="frm">
+      <tr>
+        <td class="lbl">과정명</td><td><input type="text" class="full" style="max-width:380px"></td>
+        <td class="lbl">사용여부</td><td><label><input type="radio" name="s5use" class="chk" checked>예</label> <label><input type="radio" name="s5use" class="chk">아니오</label></td>
+      </tr>
+      <tr>
+        <td class="lbl">과정별칭</td><td><input type="text" class="full" style="max-width:380px"></td>
+        <td class="lbl">매출구분</td><td><select class="w120"><option>매출구분선택</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">과정형태<span class="newtag">조건 트리거</span></td>
+        <td>
+          <label><input type="radio" name="s5form" class="chk" value="단과" checked onchange="s5onForm()">단과</label>
+          <label><input type="radio" name="s5form" class="chk" value="종합" onchange="s5onForm()">종합</label>
+          <span class="hint">‘종합’ 선택 시 콘텐츠라벨 항목이 나타납니다.</span>
+        </td>
+        <td class="lbl">종합 영문과정명</td><td><input type="text" class="w160"></td>
+      </tr>
+      <tr>
+        <td class="lbl">과정구분</td>
+        <td colspan="3">
+          <label><input type="radio" name="s5div" class="chk" checked>온라인</label>
+          <label><input type="radio" name="s5div" class="chk">모바일</label>
+          <label><input type="radio" name="s5div" class="chk">오프라인</label>
+          <label><input type="radio" name="s5div" class="chk">하이브리드</label>
+          <label><input type="radio" name="s5div" class="chk">러닝메이커</label>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">과정유형</td>
+        <td colspan="3"><select class="w160"><option>과정유형선택</option></select></td>
+      </tr>
+      <!-- ▼ 종합일 때만: 콘텐츠라벨 (과정유형 하단) ▼ -->
+      <tr id="s5labelRow" style="display:none">
+        <td class="lbl is-new">콘텐츠라벨<span class="req">*</span></td>
+        <td colspan="3" class="is-new">
+          <select class="w160" id="s5label" onchange="s5onLabel()">
+            <option value="">선택</option>
+            <option value="none">미지정</option>
+            <option value="general">범용</option>
+            <option value="specific">특정사</option>
+            <option value="client">고객사자체</option>
+            <option value="closed">폐강</option>
+          </select>
+          <span id="s5badge"></span>
+          <div class="hint">과정형태=종합일 때만 노출 · 필수</div>
+        </td>
+      </tr>
+      <!-- ▼ 특정사/고객사자체일 때만: 과정 사용기간 + 사용 기업 코드 ▼ -->
+      <tr id="s5condRow" style="display:none">
+        <td class="lbl is-new">과정 사용기간<span class="req">*</span></td>
+        <td class="is-new">
+          <input type="text" class="w160" id="s5period" placeholder="예: 20260101-20261231"
+            oninput="this.value=this.value.replace(/[^0-9-]/g,'')">
+          <div class="hint">숫자·하이픈만 입력</div>
+        </td>
+        <td class="lbl is-new">사용 기업 코드<span class="req">*</span></td>
+        <td class="is-new">
+          <input type="text" class="w160 disabled" id="s5corp" placeholder="기업 검색으로 입력" readonly>
+          <button class="btn sm" onclick="openCompany('s5corp')">검색</button>
+          <div class="hint">직접 입력 불가 · 팝업에서 선택 → ‘기업명(기업코드)’ 자동 입력</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">학습시간</td><td><input type="text" class="w120"></td>
+        <td class="lbl">난이도</td><td><select class="w90"><option>초급</option></select></td>
+      </tr>
+      <tr>
+        <td class="lbl">수강료(일반)</td><td><input type="text" class="w120"> 원</td>
+        <td class="lbl">수강료(골드)</td><td><input type="text" class="w120"> 원</td>
+      </tr>
+    </table>
+    <div class="actions" style="border-top:none">
+      <button class="btn primary" onclick="s5submit()">등록</button>
+      <button class="btn">취소</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 6. 과정 조회 -->
+<section class="screen" id="s6">
+  <div class="pagehead">
+    <div class="ttl">과정기수현황 <span class="code">(0202-A03)</span></div>
+    <div class="help">도움말</div>
+  </div>
+  <div class="changes">
+    <b>이 화면 변경사항</b> <span class="ref">(기획서 4-3-3 · 4-3-4)</span>
+    <ul>
+      <li><b>‘콘텐츠라벨’ 항목 추가(조회 전용)</b> — 위치: 기존 <b>‘과정유형’ 하단 행</b> · 배지 표기</li>
+      <li>단과는 연결 과목값 / 종합은 과정 자체값 호출 · 수정 화면 <b>미노출</b></li>
+    </ul>
+  </div>
+
+  <div class="listbar" style="justify-content:flex-end">
+    <div class="toolbtns">
+      <button class="btn sm">러닝빌더 오픈</button>
+      <button class="btn sm">과정리스트</button>
+      <button class="btn sm">과정수정</button>
+    </div>
+  </div>
+
+  <div class="card filter">
+    <table class="frm">
+      <tr><td class="lbl">과정 코드명</td><td>HLMP01990</td><td class="lbl">과정명</td><td>직급별 필수 교육(G2 대상) 원가관리 교육</td></tr>
+      <tr><td class="lbl">사용여부</td><td colspan="3">Y</td></tr>
+      <tr><td class="lbl">HCMS등록완료여부</td><td colspan="3">Y</td></tr>
+      <tr><td class="lbl">과정형태</td><td colspan="3">종합</td></tr>
+      <tr><td class="lbl">과정구분</td><td colspan="3">러닝메이커</td></tr>
+      <tr><td class="lbl">과정유형</td><td colspan="3">&nbsp;</td></tr>
+      <!-- ▼ 신규 조회 항목 (과정유형 하단) ▼ -->
+      <tr>
+        <td class="lbl is-new">콘텐츠라벨</td>
+        <td class="is-new" colspan="3"><span class="badge general">범용</span>
+          <span class="hint">조회 전용 · 종합과정: 과정 자체 입력값 호출</span></td>
+      </tr>
+      <tr><td class="lbl">러닝메이커 과정운영코드</td><td colspan="3">2230</td></tr>
+      <tr><td class="lbl">오픈배지 발급여부</td><td colspan="3">N</td></tr>
+    </table>
+  </div>
+</section>
+
+<div class="footnote">
+  본 프로토타입은 기획서 <b>[260829] 과목/과정 - 콘텐츠 라벨</b> 기준 개발 참고용 화면입니다.
+  실제 데이터·전체 필드가 아닌 콘텐츠 라벨 관련 요소 중심으로 재현했으며, 노란색 강조는 이번 개발로 추가·변경되는 부분입니다.
+</div>
+
+</div><!-- /wrap -->
+
+<!-- 기업명 검색 팝업 (실제 화면: PopFindCompany.aspx 참고) -->
+<div class="modal-bg" id="companyModal">
+  <div class="modal">
+    <div class="mh">기업명 검색 <span onclick="closeCompany()">✕</span></div>
+    <div class="mb">
+      <div class="srow">
+        <select id="companyField" style="flex:0 0 130px;height:30px;border:1px solid #c8ccd3;border-radius:4px;padding:0 6px">
+          <option value="name">기업명</option>
+          <option value="code">기업코드</option>
+        </select>
+        <input type="text" id="companyKeyword" placeholder="검색어 입력"
+          onkeydown="if(event.key==='Enter')searchCompany()">
+        <button class="btn primary sm" onclick="searchCompany()">검색</button>
+      </div>
+      <table>
+        <thead><tr><th style="width:90px">기업코드</th><th>기업명</th><th style="width:130px">업종</th></tr></thead>
+        <tbody id="companyRows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 콘텐츠 라벨 정의 (기획서 4-1) ===== */
+var LABELS = {
+  none:{cls:'none',text:'미지정'}, general:{cls:'general',text:'범용'},
+  specific:{cls:'specific',text:'특정사'}, client:{cls:'client',text:'고객사자체'},
+  closed:{cls:'closed',text:'폐강'}
+};
+function badge(k){ if(!k||!LABELS[k]) return ''; var l=LABELS[k];
+  return '<span class="badge '+l.cls+'">'+l.text+'</span>'; }
+
+/* ===== 탭 전환 ===== */
+document.getElementById('tabs').addEventListener('click',function(e){
+  var t=e.target.closest('.tab'); if(!t)return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active'); document.getElementById(t.dataset.s).classList.add('active');
+  window.scrollTo(0,0);
+});
+
+/* ===== 과목 목록 데이터 ===== */
+var SUBJECTS=[
+  {no:98763,code:'HLAC32494',ucode:'HLAP32543',div:'온라인과목',type:'동영상(공용플레이어)',name:'약물감시의 이해와 임직원의 이상사례 보고(NEW) 모바일연동',label:'specific',fee:'1,000원',gold:'1,000원',date:'2026-08-27'},
+  {no:98762,code:'HLAC32493',ucode:'HLAP32542',div:'온라인과목',type:'저작과정(모듈화)',name:'[일동그룹] 의약품 안전성 정보 교육 모듈화과정',label:'specific',fee:'0원',gold:'0원',date:'2026-08-27'},
+  {no:98761,code:'HLAC32492',ucode:'HLAP32541',div:'온라인과목',type:'신규 모듈화과정',name:'2026년 청렴교육(이해충돌방지법 포함)',label:'general',fee:'0원',gold:'0원',date:'2026-08-27'},
+  {no:98760,code:'HLAC32491',ucode:'HLAP32540',div:'온라인과목',type:'동영상(공용플레이어)',name:'[별별고민다방] 정상훈과 함께하는 직장 내 성희롱 예방교육',label:'general',fee:'0원',gold:'0원',date:'2026-08-26'},
+  {no:98759,code:'HLAC32490',ucode:'HLAP32539',div:'온라인과목',type:'저작과정(모듈화)',name:'러닝메이커 리더십 자체제작 과정',label:'client',fee:'0원',gold:'0원',date:'2026-08-26'},
+  {no:98758,code:'HLAC32489',ucode:'HLAP32538',div:'온라인과목',type:'동영상(공용플레이어)',name:'(구)2019 개정 노동법 기본과정',label:'closed',fee:'0원',gold:'0원',date:'2026-08-25'},
+  {no:98757,code:'HLAC32488',ucode:'HLAP32537',div:'온라인과목',type:'HTML5 일반',name:'엑셀 실무 데이터 분석 입문',label:'none',fee:'0원',gold:'0원',date:'2026-08-25'}
+];
+function renderSubjects(list){
+  document.getElementById('s1rows').innerHTML=list.map(function(r){
+    return '<tr><td>'+r.no+'</td><td>'+r.code+'</td><td>'+r.ucode+'</td><td>'+r.div+'</td><td>'+r.type+'</td>'
+      +'<td class="name">'+badge(r.label)+'<a class="subj" href="#" onclick="return false">'+r.name+'</a></td>'
+      +'<td>Y</td><td>고객사(B2B)</td><td>'+r.fee+'</td><td>'+r.gold+'</td><td>'+r.date+'</td></tr>';
+  }).join('');
+  document.getElementById('s1count').textContent=list.length.toLocaleString();
+}
+function filterSubjects(){
+  var v=document.getElementById('s1label').value;
+  renderSubjects(v==='all'?SUBJECTS:SUBJECTS.filter(r=>r.label===v));
+}
+
+/* ===== 과정 목록 데이터 ===== */
+var COURSES=[
+  {no:119512,code:'HLMP01990',scode:'',form:'종합',name:'직급별 필수 교육(G2 대상) 원가관리 교육',label:'general',period:'0시간',date:'2026-08-28'},
+  {no:119511,code:'HLMP01989',scode:'',form:'종합',name:'직급별 필수 교육 회계기초 과정',label:'none',period:'0시간',date:'2026-08-28'},
+  {no:119510,code:'HLMP01988',scode:'',form:'종합',name:'세일즈칼리지 온보딩저니_260831',label:'general',period:'20시간',date:'2026-08-27'},
+  {no:119509,code:'HLAP32543',scode:'HLAC32494',form:'단과',name:'약물감시의 이해와 임직원의 이상사례 보고(NEW)',label:'specific',period:'1시간',date:'2026-08-27',from:'과목'},
+  {no:119508,code:'HLAP32542',scode:'HLAC32493',form:'단과',name:'[일동그룹] 의약품 안전성 정보 교육',label:'specific',period:'1시간',date:'2026-08-27',from:'과목'},
+  {no:119507,code:'HLMP01987',scode:'',form:'종합',name:'리더십 교육(매니저)',label:'none',period:'0시간',date:'2026-08-27'}
+];
+function renderCourses(list){
+  document.getElementById('s4rows').innerHTML=list.map(function(r){
+    var src=r.from==='과목'?' title="단과: 연결 과목('+r.scode+')의 라벨 호출"':' title="종합: 과정 자체 입력값"';
+    return '<tr><td>'+r.no+'</td><td>'+r.code+'</td><td>'+(r.scode||'-')+'</td><td>'+r.form+'</td>'
+      +'<td class="name"'+src+'>'+badge(r.label)+'<a class="subj" href="#" onclick="return false">'+r.name+'</a></td>'
+      +'<td>N</td><td>Y</td><td>'+r.period+'</td><td>0 원</td><td>0 원</td><td>'+r.date+'</td></tr>';
+  }).join('');
+  document.getElementById('s4count').textContent=list.length.toLocaleString();
+}
+function filterCourses(){
+  var v=document.getElementById('s4label').value;
+  renderCourses(v==='all'?COURSES:COURSES.filter(r=>r.label===v));
+}
+
+/* ===== 과목 등록 조건부 로직 (4-2-2) ===== */
+function s2onLabel(){
+  var v=document.getElementById('s2label').value;
+  document.getElementById('s2badge').innerHTML=badge(v);
+  var cond=(v==='specific'||v==='client');
+  // 과목 사용기간 필수 토글
+  document.getElementById('s2periodReq').style.display=cond?'inline':'none';
+  document.getElementById('s2periodLbl').classList.toggle('is-new',true);
+  document.getElementById('s2cvtReq').style.display=cond?'inline':'none';
+  // 고객사 과정 유형 자동 선택
+  var cvt=document.getElementById('s2cvt');
+  if(v==='specific') cvt.value='self';        // 특정사 → 자체개발
+  else if(v==='client') cvt.value='custom';   // 고객사자체 → 커스터마이징
+  document.getElementById('s2cvtCell').classList.toggle('col-new',cond);
+  document.getElementById('s2period').classList.toggle('col-new',cond);
+}
+function s2submit(){
+  var v=document.getElementById('s2label').value;
+  if(!v){alert('콘텐츠라벨을 선택하세요');return;}
+  if(v==='specific'||v==='client'){
+    if(!document.getElementById('s2period').value.trim()){alert('과목 사용기간을 입력하세요');return;}
+    if(!document.getElementById('s2corp').value.trim()){alert('고객사 과정 유형의 기업코드를 입력하세요');return;}
+  }
+  alert('등록되었습니다. (프로토타입)');
+}
+
+/* ===== 과정 등록 조건부 로직 (4-3-2) ===== */
+function s5onForm(){
+  var form=document.querySelector('input[name=s5form]:checked').value;
+  var show=(form==='종합');
+  document.getElementById('s5labelRow').style.display=show?'':'none';
+  if(!show){ // 단과로 돌아가면 초기화
+    document.getElementById('s5label').value='';
+    document.getElementById('s5badge').innerHTML='';
+    document.getElementById('s5condRow').style.display='none';
+  }
+}
+function s5onLabel(){
+  var v=document.getElementById('s5label').value;
+  document.getElementById('s5badge').innerHTML=badge(v);
+  var cond=(v==='specific'||v==='client');
+  document.getElementById('s5condRow').style.display=cond?'':'none';
+}
+function s5submit(){
+  var form=document.querySelector('input[name=s5form]:checked').value;
+  if(form==='종합'){
+    var v=document.getElementById('s5label').value;
+    if(!v){alert('콘텐츠라벨을 선택하세요');return;}
+    if(v==='specific'||v==='client'){
+      if(!document.getElementById('s5period').value.trim()){alert('과정 사용기간을 입력하세요');return;}
+      if(!document.getElementById('s5corp').value.trim()){alert('사용 기업 코드를 입력하세요');return;}
+    }
+  }
+  alert('등록되었습니다. (프로토타입)');
+}
+
+/* ===== 기업명 검색 팝업 (실제 화면: PopFindCompany.aspx 참고, 4-3-2 ②) =====
+   컬럼: 기업코드 / 기업명 / 업종 · 상단 기업명|기업코드 선택 + 검색어 */
+var COMPANYES=[
+  {code:'0',    name:'(주)휴넷',        biz:'사이버,경영컨설팅외'},
+  {code:'1881', name:'휴넷(test)',      biz:''},
+  {code:'2162', name:'휴넷(자체)',      biz:'종목'},
+  {code:'3825', name:'(주)휴넷(HRD)',   biz:''},
+  {code:'4750', name:'휴넷IT지원본부',  biz:''},
+  {code:'4751', name:'휴넷운영팀',      biz:''},
+  {code:'4867', name:'휴넷(마케팅)',    biz:''},
+  {code:'5509', name:'씨제이미디어(휴넷)', biz:'서비스외'},
+  {code:'1023', name:'일동그룹',        biz:'제약'},
+  {code:'4871', name:'별별고민다방',    biz:'서비스'}
+];
+var companyTarget=null;
+function openCompany(id){
+  companyTarget=id;
+  document.getElementById('companyKeyword').value='';
+  document.getElementById('companyField').value='name';
+  renderCompanyRows(COMPANYES);
+  document.getElementById('companyModal').classList.add('on');
+  setTimeout(function(){document.getElementById('companyKeyword').focus();},50);
+}
+function renderCompanyRows(list){
+  var tb=document.getElementById('companyRows');
+  if(!list.length){ tb.innerHTML='<tr><td colspan="3" style="text-align:center;color:#888;padding:16px">검색 결과가 없습니다.</td></tr>'; return; }
+  tb.innerHTML=list.map(function(c){
+    return '<tr onclick="pickCompany(\''+c.name.replace(/'/g,"\\'")+'\',\''+c.code+'\')">'
+      +'<td style="text-align:center">'+c.code+'</td><td>'+c.name+'</td>'
+      +'<td style="color:#c05a12">'+(c.biz||'')+'</td></tr>';
+  }).join('');
+}
+function searchCompany(){
+  var field=document.getElementById('companyField').value;
+  var kw=document.getElementById('companyKeyword').value.trim();
+  if(!kw){ renderCompanyRows(COMPANYES); return; }
+  renderCompanyRows(COMPANYES.filter(function(c){
+    return field==='code' ? c.code.indexOf(kw)>-1 : c.name.indexOf(kw)>-1;
+  }));
+}
+function pickCompany(name,code){
+  var el=document.getElementById(companyTarget);
+  el.value=name+'('+code+')';         // $기업명$($기업코드$) 형식
+  el.classList.remove('disabled');
+  closeCompany();
+}
+function closeCompany(){document.getElementById('companyModal').classList.remove('on');}
+
+/* 초기 렌더 */
+renderSubjects(SUBJECTS);
+renderCourses(COURSES);
+</script>
+</body>
+</html>
