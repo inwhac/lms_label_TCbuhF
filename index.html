@@ -153,6 +153,7 @@
   <div class="tab" data-s="s4"><span class="grp">과정</span>④ 목록</div>
   <div class="tab" data-s="s5"><span class="grp">과정</span>⑤ 등록</div>
   <div class="tab" data-s="s6"><span class="grp">과정</span>⑥ 조회</div>
+  <div class="tab" data-s="s7"><span class="grp">공통</span>⑦ 신규 개설</div>
 </div>
 
 <div class="wrap">
@@ -166,7 +167,7 @@
   <div class="changes">
     <b>이 화면 변경사항</b> <span class="ref">(기획서 4-2-1)</span>
     <ul>
-      <li>검색 필터에 <b>‘콘텐츠라벨’ 드롭다운</b> 추가 (전체 / 미지정 / 범용 / 특정사 / 고객사자체 / 폐강)</li>
+      <li>검색 필터에 <b>‘콘텐츠라벨’ 드롭다운</b> 추가 (전체 / 범용 / 특정사 / 고객사자체 / 폐강)</li>
       <li>목록 <b>‘과목명’ 앞에 콘텐츠라벨 배지</b> 표기</li>
     </ul>
   </div>
@@ -199,7 +200,6 @@
         <td class="is-new">
           <select class="w120" id="s1label">
             <option value="all">전체</option>
-            <option value="none">미지정</option>
             <option value="general">범용</option>
             <option value="specific">특정사</option>
             <option value="client">고객사자체</option>
@@ -252,7 +252,7 @@
     <ul>
       <li><b>‘콘텐츠라벨’ 항목 추가</b> — 위치: 기존 <b>‘모바일 노출 여부’ 하단 행</b> · 드롭다운 · 필수</li>
       <li>조건: 콘텐츠라벨 = <b>특정사 OR 고객사자체</b> → <b>과목 사용기간(기존) + 기업코드(기존 ‘고객사 과정 유형’) 필수</b></li>
-      <li>특정사 선택 시 고객사 과정 유형 <b>[자체개발]</b> 자동, 고객사자체 선택 시 <b>[커스터마이징]</b> 자동</li>
+      <li>특정사 선택 시 고객사 과정 유형 <b>[커스터마이징]</b> 자동, 고객사자체 선택 시 <b>[자체개발]</b> 자동</li>
     </ul>
   </div>
 
@@ -290,7 +290,6 @@
         <td class="is-new" colspan="5">
           <select class="w160" id="s2label" onchange="s2onLabel()">
             <option value="">선택</option>
-            <option value="none">미지정</option>
             <option value="general">범용</option>
             <option value="specific">특정사</option>
             <option value="client">고객사자체</option>
@@ -340,6 +339,7 @@
     <b>이 화면 변경사항</b> <span class="ref">(기획서 4-2-3 · 4-2-4)</span>
     <ul>
       <li><b>‘콘텐츠라벨’ 항목 추가(조회 전용)</b> — 위치: 기존 <b>‘영문과목명’ 하단 행</b> · 배지로 표기</li>
+      <li>콘텐츠라벨이 <b>특정사·고객사자체</b>면 <b>과목 사용기간 · 사용 기업정보</b>도 함께 조회 표기</li>
       <li>수정 화면에서는 <b>미노출</b> (개별 수정 불가 — 컨텐츠매니지먼트팀 비정형통계로만 수정)</li>
     </ul>
   </div>
@@ -366,6 +366,13 @@
         <td class="is-new" colspan="3"><span class="badge specific">특정사</span>
           <span class="hint">조회 전용 · 등록 시 입력된 값 호출</span></td>
       </tr>
+      <!-- ▼ 특정사·고객사자체일 때만 조회 표기 ▼ -->
+      <tr>
+        <td class="lbl is-new">과목 사용기간</td>
+        <td class="is-new">2026-01-01 ~ 2026-12-31</td>
+        <td class="lbl is-new">사용 기업정보</td>
+        <td class="is-new">일동그룹(1023)</td>
+      </tr>
       <tr><td class="lbl">과목구분</td><td colspan="3">온라인</td></tr>
       <tr><td class="lbl">사용과정코드</td><td colspan="3">HLAP32543</td></tr>
       <tr><td class="lbl">제작사</td><td colspan="3">T3(티쓰리)</td></tr>
@@ -386,7 +393,7 @@
     <ul>
       <li>검색 필터에 <b>‘콘텐츠라벨’ 드롭다운</b> 추가</li>
       <li>목록 <b>‘과정명’ 앞에 콘텐츠라벨 배지</b> 표기 —
-        <b>단과</b>는 연결된 ‘과목’의 라벨 호출 / <b>종합</b>은 과정 자체 입력값 호출</li>
+        <b>단과·종합 모두 과정 자체 입력값</b>으로 표기 (단과 과정도 콘텐츠라벨 별도 보유)</li>
     </ul>
   </div>
 
@@ -413,7 +420,6 @@
         <td class="is-new">
           <select class="w120" id="s4label">
             <option value="all">전체</option>
-            <option value="none">미지정</option>
             <option value="general">범용</option>
             <option value="specific">특정사</option>
             <option value="client">고객사자체</option>
@@ -463,8 +469,7 @@
   <div class="changes">
     <b>이 화면 변경사항</b> <span class="ref">(기획서 4-3-2)</span>
     <ul>
-      <li>★ <b>과정형태 = [종합]</b> 선택 시에만 아래 항목 노출</li>
-      <li><b>‘콘텐츠라벨’ 추가</b> — 위치: 기존 <b>‘과정유형’ 하단 행</b> · 드롭다운 · 필수</li>
+      <li><b>‘콘텐츠라벨’ 추가</b> — 위치: 기존 <b>‘과정유형’ 하단 행</b> · 드롭다운 · 필수 · <b>단과·종합 모두 노출</b>(단과 과정도 별도 설정)</li>
       <li>조건: 특정사 OR 고객사자체 → <b>‘과정 사용기간’(숫자·하이픈만) + ‘사용 기업 코드’(검색 팝업) 추가·필수</b></li>
     </ul>
   </div>
@@ -480,11 +485,10 @@
         <td class="lbl">매출구분</td><td><select class="w120"><option>매출구분선택</option></select></td>
       </tr>
       <tr>
-        <td class="lbl">과정형태<span class="newtag">조건 트리거</span></td>
+        <td class="lbl">과정형태</td>
         <td>
-          <label><input type="radio" name="s5form" class="chk" value="단과" checked onchange="s5onForm()">단과</label>
-          <label><input type="radio" name="s5form" class="chk" value="종합" onchange="s5onForm()">종합</label>
-          <span class="hint">‘종합’ 선택 시 콘텐츠라벨 항목이 나타납니다.</span>
+          <label><input type="radio" name="s5form" class="chk" value="단과" checked>단과</label>
+          <label><input type="radio" name="s5form" class="chk" value="종합">종합</label>
         </td>
         <td class="lbl">종합 영문과정명</td><td><input type="text" class="w160"></td>
       </tr>
@@ -502,20 +506,19 @@
         <td class="lbl">과정유형</td>
         <td colspan="3"><select class="w160"><option>과정유형선택</option></select></td>
       </tr>
-      <!-- ▼ 종합일 때만: 콘텐츠라벨 (과정유형 하단) ▼ -->
-      <tr id="s5labelRow" style="display:none">
+      <!-- ▼ 콘텐츠라벨 (과정유형 하단) · 단과·종합 모두 노출 ▼ -->
+      <tr>
         <td class="lbl is-new">콘텐츠라벨<span class="req">*</span></td>
         <td colspan="3" class="is-new">
           <select class="w160" id="s5label" onchange="s5onLabel()">
             <option value="">선택</option>
-            <option value="none">미지정</option>
             <option value="general">범용</option>
             <option value="specific">특정사</option>
             <option value="client">고객사자체</option>
             <option value="closed">폐강</option>
           </select>
           <span id="s5badge"></span>
-          <div class="hint">과정형태=종합일 때만 노출 · 필수</div>
+          <div class="hint">단과·종합 모두 필수 입력</div>
         </td>
       </tr>
       <!-- ▼ 특정사/고객사자체일 때만: 과정 사용기간 + 사용 기업 코드 ▼ -->
@@ -559,7 +562,7 @@
     <b>이 화면 변경사항</b> <span class="ref">(기획서 4-3-3 · 4-3-4)</span>
     <ul>
       <li><b>‘콘텐츠라벨’ 항목 추가(조회 전용)</b> — 위치: 기존 <b>‘과정유형’ 하단 행</b> · 배지 표기</li>
-      <li>단과는 연결 과목값 / 종합은 과정 자체값 호출 · 수정 화면 <b>미노출</b></li>
+      <li>단과·종합 모두 <b>과정 자체값</b> 호출 · 특정사·고객사자체면 <b>사용기간·기업정보</b>도 표기 · 수정 화면 <b>미노출</b></li>
     </ul>
   </div>
 
@@ -582,12 +585,108 @@
       <!-- ▼ 신규 조회 항목 (과정유형 하단) ▼ -->
       <tr>
         <td class="lbl is-new">콘텐츠라벨</td>
-        <td class="is-new" colspan="3"><span class="badge general">범용</span>
-          <span class="hint">조회 전용 · 종합과정: 과정 자체 입력값 호출</span></td>
+        <td class="is-new" colspan="3"><span class="badge client">고객사자체</span>
+          <span class="hint">조회 전용 · 과정 자체 입력값 호출</span></td>
+      </tr>
+      <!-- ▼ 특정사·고객사자체일 때만 조회 표기 ▼ -->
+      <tr>
+        <td class="lbl is-new">과정 사용기간</td>
+        <td class="is-new">2026-08-28 ~ 2027-08-28</td>
+        <td class="lbl is-new">사용 기업정보</td>
+        <td class="is-new">일동그룹(1023)</td>
       </tr>
       <tr><td class="lbl">러닝메이커 과정운영코드</td><td colspan="3">2230</td></tr>
       <tr><td class="lbl">오픈배지 발급여부</td><td colspan="3">N</td></tr>
     </table>
+  </div>
+</section>
+
+<!-- ============================================================ 7. 신규 개설 -->
+<section class="screen" id="s7">
+  <div class="pagehead">
+    <div class="ttl">신규 개설 <span class="code">(0212-A00)</span></div>
+    <div class="help">도움말</div>
+  </div>
+  <div class="changes">
+    <b>이 화면 변경사항</b> <span class="ref">(기획서 4-4)</span>
+    <ul>
+      <li>엑셀 일괄 업로드 방식 · 샘플 엑셀 <b>맨 끝에 3개 컬럼 추가</b>(파싱 안정성)</li>
+      <li><b>콘텐츠라벨</b>(코드 <b>1 범용 / 2 특정사 / 3 고객사자체</b> · 필수, 폐강 제외) · 특정사·고객사자체면 <b>사용기간 · 사용기업코드 필수</b></li>
+      <li>저장 시 유효성 검증 → 누락 시 alert “$컬럼명$을/를 입력하세요” · 정상 시 고객사 과정 유형 자동(특정사→커스터마이징, 고객사자체→자체개발)</li>
+    </ul>
+  </div>
+
+  <div class="card filter">
+    <table class="frm">
+      <tr>
+        <td class="lbl">엑셀 파일</td>
+        <td colspan="3">
+          <button class="btn sm">파일 선택</button>
+          <span style="color:var(--muted);margin:0 8px">선택된 파일 없음</span>
+          <button class="btn primary sm" onclick="s7save()">저장</button>
+          <button class="btn sm" onclick="alert('샘플 엑셀 다운로드 (프로토타입)')" style="margin-left:8px">샘플파일 엑셀 다운로드</button>
+        </td>
+      </tr>
+    </table>
+    <div style="padding:12px 14px;color:var(--primary);font-size:12px;line-height:1.7;background:#fff">
+      엑셀파일에 입력한 데이터외에 다른행을 편집하지 마십시오.<br>
+      행에 입력한 값이 하나도 없더라도 셀크기를 늘리거나 줄이는 것으로도 데이터로 인식하여 오류가 발생합니다.<br>
+      (문제가 되는 행은 행삭제를 해주시면 됩니다.)
+    </div>
+  </div>
+
+  <!-- 샘플 엑셀 컬럼 미리보기 -->
+  <div class="changes" style="background:#fff;border-color:var(--line);border-left-color:var(--new)">
+    <b>샘플 엑셀 추가 컬럼</b> <span class="ref">(기존 54개 컬럼 뒤, 55~57열)</span>
+    <div class="tbl-wrap" style="margin-top:8px">
+      <table class="grid" style="min-width:620px">
+        <thead><tr>
+          <th>…</th><th>52 사업유형</th><th>53 매출구분</th>
+          <th class="col-new">55 콘텐츠라벨</th><th class="col-new">56 과목과정 사용기간</th><th class="col-new">57 사용 기업코드</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>…</td><td>ERP_00001_…</td><td>060003</td>
+            <td class="col-new">2</td><td class="col-new">20260101-20261231</td><td class="col-new">일동그룹(1023)</td></tr>
+          <tr><td>…</td><td>ERP_00001_…</td><td>060003</td>
+            <td class="col-new">1</td><td class="col-new">-</td><td class="col-new">-</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hint" style="margin-top:6px">코드값 입력: 1(범용) / 2(특정사) / 3(고객사자체) · 2·3이면 사용기간·기업코드 필수 / 1이면 공란(-)</div>
+  </div>
+
+  <!-- 업로드 검증 시뮬레이터 -->
+  <div class="card filter">
+    <div style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--line2);background:var(--head)">
+      업로드 검증 시뮬레이터 <span class="newtag">데모</span>
+      <span class="hint" style="font-weight:400"> — 한 행을 입력하고 [저장]으로 유효성 검증을 확인하세요</span>
+    </div>
+    <table class="frm">
+      <tr>
+        <td class="lbl is-new">콘텐츠라벨(코드)</td>
+        <td class="is-new">
+          <select class="w120" id="s7label" onchange="s7onLabel()">
+            <option value="">선택</option>
+            <option value="1">1 · 범용</option>
+            <option value="2">2 · 특정사</option>
+            <option value="3">3 · 고객사자체</option>
+          </select>
+          <span id="s7badge"></span>
+        </td>
+        <td class="lbl is-new" id="s7cvtLbl">고객사 과정 유형(자동)</td>
+        <td class="is-new"><input type="text" class="w160 disabled" id="s7cvt" readonly placeholder="라벨 선택 시 자동"></td>
+      </tr>
+      <tr id="s7condRow" style="display:none">
+        <td class="lbl is-new">과목과정 사용기간<span class="req">*</span></td>
+        <td class="is-new"><input type="text" class="w160" id="s7period" placeholder="20260101-20261231"
+          oninput="this.value=this.value.replace(/[^0-9-]/g,'')"></td>
+        <td class="lbl is-new">사용 기업코드<span class="req">*</span></td>
+        <td class="is-new"><input type="text" class="w160" id="s7corp" placeholder="예: 일동그룹(1023)"></td>
+      </tr>
+    </table>
+    <div class="actions" style="border-top:none">
+      <button class="btn primary" onclick="s7save()">저장(검증)</button>
+    </div>
   </div>
 </section>
 
@@ -623,7 +722,7 @@
 <script>
 /* ===== 콘텐츠 라벨 정의 (기획서 4-1) ===== */
 var LABELS = {
-  none:{cls:'none',text:'미지정'}, general:{cls:'general',text:'범용'},
+  general:{cls:'general',text:'범용'},
   specific:{cls:'specific',text:'특정사'}, client:{cls:'client',text:'고객사자체'},
   closed:{cls:'closed',text:'폐강'}
 };
@@ -647,7 +746,7 @@ var SUBJECTS=[
   {no:98760,code:'HLAC32491',ucode:'HLAP32540',div:'온라인과목',type:'동영상(공용플레이어)',name:'[별별고민다방] 정상훈과 함께하는 직장 내 성희롱 예방교육',label:'general',fee:'0원',gold:'0원',date:'2026-08-26'},
   {no:98759,code:'HLAC32490',ucode:'HLAP32539',div:'온라인과목',type:'저작과정(모듈화)',name:'러닝메이커 리더십 자체제작 과정',label:'client',fee:'0원',gold:'0원',date:'2026-08-26'},
   {no:98758,code:'HLAC32489',ucode:'HLAP32538',div:'온라인과목',type:'동영상(공용플레이어)',name:'(구)2019 개정 노동법 기본과정',label:'closed',fee:'0원',gold:'0원',date:'2026-08-25'},
-  {no:98757,code:'HLAC32488',ucode:'HLAP32537',div:'온라인과목',type:'HTML5 일반',name:'엑셀 실무 데이터 분석 입문',label:'none',fee:'0원',gold:'0원',date:'2026-08-25'}
+  {no:98757,code:'HLAC32488',ucode:'HLAP32537',div:'온라인과목',type:'HTML5 일반',name:'엑셀 실무 데이터 분석 입문',label:null,fee:'0원',gold:'0원',date:'2026-08-25'}
 ];
 function renderSubjects(list){
   document.getElementById('s1rows').innerHTML=list.map(function(r){
@@ -665,17 +764,16 @@ function filterSubjects(){
 /* ===== 과정 목록 데이터 ===== */
 var COURSES=[
   {no:119512,code:'HLMP01990',scode:'',form:'종합',name:'직급별 필수 교육(G2 대상) 원가관리 교육',label:'general',period:'0시간',date:'2026-08-28'},
-  {no:119511,code:'HLMP01989',scode:'',form:'종합',name:'직급별 필수 교육 회계기초 과정',label:'none',period:'0시간',date:'2026-08-28'},
+  {no:119511,code:'HLMP01989',scode:'',form:'종합',name:'직급별 필수 교육 회계기초 과정',label:null,period:'0시간',date:'2026-08-28'},
   {no:119510,code:'HLMP01988',scode:'',form:'종합',name:'세일즈칼리지 온보딩저니_260831',label:'general',period:'20시간',date:'2026-08-27'},
-  {no:119509,code:'HLAP32543',scode:'HLAC32494',form:'단과',name:'약물감시의 이해와 임직원의 이상사례 보고(NEW)',label:'specific',period:'1시간',date:'2026-08-27',from:'과목'},
-  {no:119508,code:'HLAP32542',scode:'HLAC32493',form:'단과',name:'[일동그룹] 의약품 안전성 정보 교육',label:'specific',period:'1시간',date:'2026-08-27',from:'과목'},
-  {no:119507,code:'HLMP01987',scode:'',form:'종합',name:'리더십 교육(매니저)',label:'none',period:'0시간',date:'2026-08-27'}
+  {no:119509,code:'HLAP32543',scode:'HLAC32494',form:'단과',name:'약물감시의 이해와 임직원의 이상사례 보고(NEW)',label:'specific',period:'1시간',date:'2026-08-27'},
+  {no:119508,code:'HLAP32542',scode:'HLAC32493',form:'단과',name:'[일동그룹] 의약품 안전성 정보 교육',label:'client',period:'1시간',date:'2026-08-27'},
+  {no:119507,code:'HLMP01987',scode:'',form:'종합',name:'리더십 교육(매니저)',label:null,period:'0시간',date:'2026-08-27'}
 ];
 function renderCourses(list){
   document.getElementById('s4rows').innerHTML=list.map(function(r){
-    var src=r.from==='과목'?' title="단과: 연결 과목('+r.scode+')의 라벨 호출"':' title="종합: 과정 자체 입력값"';
     return '<tr><td>'+r.no+'</td><td>'+r.code+'</td><td>'+(r.scode||'-')+'</td><td>'+r.form+'</td>'
-      +'<td class="name"'+src+'>'+badge(r.label)+'<a class="subj" href="#" onclick="return false">'+r.name+'</a></td>'
+      +'<td class="name" title="'+r.form+': 과정 자체 입력값">'+badge(r.label)+'<a class="subj" href="#" onclick="return false">'+r.name+'</a></td>'
       +'<td>N</td><td>Y</td><td>'+r.period+'</td><td>0 원</td><td>0 원</td><td>'+r.date+'</td></tr>';
   }).join('');
   document.getElementById('s4count').textContent=list.length.toLocaleString();
@@ -696,8 +794,8 @@ function s2onLabel(){
   document.getElementById('s2cvtReq').style.display=cond?'inline':'none';
   // 고객사 과정 유형 자동 선택
   var cvt=document.getElementById('s2cvt');
-  if(v==='specific') cvt.value='self';        // 특정사 → 자체개발
-  else if(v==='client') cvt.value='custom';   // 고객사자체 → 커스터마이징
+  if(v==='specific') cvt.value='custom';       // 특정사 → 커스터마이징
+  else if(v==='client') cvt.value='self';      // 고객사자체 → 자체개발
   document.getElementById('s2cvtCell').classList.toggle('col-new',cond);
   document.getElementById('s2period').classList.toggle('col-new',cond);
 }
@@ -711,17 +809,7 @@ function s2submit(){
   alert('등록되었습니다. (프로토타입)');
 }
 
-/* ===== 과정 등록 조건부 로직 (4-3-2) ===== */
-function s5onForm(){
-  var form=document.querySelector('input[name=s5form]:checked').value;
-  var show=(form==='종합');
-  document.getElementById('s5labelRow').style.display=show?'':'none';
-  if(!show){ // 단과로 돌아가면 초기화
-    document.getElementById('s5label').value='';
-    document.getElementById('s5badge').innerHTML='';
-    document.getElementById('s5condRow').style.display='none';
-  }
-}
+/* ===== 과정 등록 조건부 로직 (4-3-2) · 단과·종합 모두 콘텐츠라벨 필수 ===== */
 function s5onLabel(){
   var v=document.getElementById('s5label').value;
   document.getElementById('s5badge').innerHTML=badge(v);
@@ -729,14 +817,11 @@ function s5onLabel(){
   document.getElementById('s5condRow').style.display=cond?'':'none';
 }
 function s5submit(){
-  var form=document.querySelector('input[name=s5form]:checked').value;
-  if(form==='종합'){
-    var v=document.getElementById('s5label').value;
-    if(!v){alert('콘텐츠라벨을 선택하세요');return;}
-    if(v==='specific'||v==='client'){
-      if(!document.getElementById('s5period').value.trim()){alert('과정 사용기간을 입력하세요');return;}
-      if(!document.getElementById('s5corp').value.trim()){alert('사용 기업 코드를 입력하세요');return;}
-    }
+  var v=document.getElementById('s5label').value;
+  if(!v){alert('콘텐츠라벨을 선택하세요');return;}
+  if(v==='specific'||v==='client'){
+    if(!document.getElementById('s5period').value.trim()){alert('과정 사용기간을 입력하세요');return;}
+    if(!document.getElementById('s5corp').value.trim()){alert('사용 기업 코드를 입력하세요');return;}
   }
   alert('등록되었습니다. (프로토타입)');
 }
@@ -788,6 +873,27 @@ function pickCompany(name,code){
   closeCompany();
 }
 function closeCompany(){document.getElementById('companyModal').classList.remove('on');}
+
+/* ===== 신규 개설 검증 로직 (4-4) · 코드 1범용/2특정사/3고객사자체 ===== */
+var S7BADGE={'1':'general','2':'specific','3':'client'};
+function s7onLabel(){
+  var v=document.getElementById('s7label').value;
+  document.getElementById('s7badge').innerHTML=badge(S7BADGE[v]||'');
+  var cond=(v==='2'||v==='3');
+  document.getElementById('s7condRow').style.display=cond?'':'none';
+  // 고객사 과정 유형 자동 (특정사→커스터마이징 / 고객사자체→자체개발)
+  var cvt=document.getElementById('s7cvt');
+  cvt.value = v==='2' ? '커스터마이징' : (v==='3' ? '자체개발' : '');
+}
+function s7save(){
+  var v=document.getElementById('s7label').value;
+  if(!v){alert('콘텐츠라벨을/를 입력하세요');return;}
+  if(v==='2'||v==='3'){
+    if(!document.getElementById('s7period').value.trim()){alert('과목과정 사용기간을/를 입력하세요');return;}
+    if(!document.getElementById('s7corp').value.trim()){alert('사용 기업코드를 입력하세요');return;}
+  }
+  alert('정상 처리되었습니다. (프로토타입)');
+}
 
 /* 초기 렌더 */
 renderSubjects(SUBJECTS);
