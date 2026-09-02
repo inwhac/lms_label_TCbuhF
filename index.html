@@ -112,6 +112,9 @@
   .newtag{display:inline-block;background:var(--new);color:#fff;font-size:9.5px;font-weight:700;
     padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:1px}
   body.hideHL .newtag{display:none}
+  .chip{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;margin-left:6px;vertical-align:1px}
+  .chip.edit{background:#e7f5ec;color:#137a3e;border:1px solid #b6e0c6}
+  .chip.lock{background:#f1f2f4;color:#6b7280;border:1px solid #d8dbe0}
 
   .req{color:var(--primary);font-weight:800;margin-left:2px}
   .hint{color:var(--muted);font-size:11px;margin-top:3px}
@@ -168,6 +171,7 @@
     <b>이 화면 변경사항</b> <span class="ref">(기획서 4-2-1)</span>
     <ul>
       <li>검색 필터에 <b>‘콘텐츠라벨’ 드롭다운</b> 추가 (전체 / 범용 / 특정사 / 고객사자체 / 폐강)</li>
+      <li>기존 과목명 뒤 라벨(<b>공통과정·폐강·대체·특정변경</b>) 4종 <b>표기 폐기</b> → 콘텐츠라벨 배지로 대체</li>
       <li>목록 <b>‘과목명’ 앞에 콘텐츠라벨 배지</b> 표기</li>
     </ul>
   </div>
@@ -293,10 +297,9 @@
             <option value="general">범용</option>
             <option value="specific">특정사</option>
             <option value="client">고객사자체</option>
-            <option value="closed">폐강</option>
           </select>
           <span id="s2badge"></span>
-          <div class="hint">필수 입력. 특정사·고객사자체 선택 시 아래 ‘고객사 과정 유형’과 위 ‘과목 사용기간’이 필수로 전환됩니다.</div>
+          <div class="hint">필수 입력. 특정사·고객사자체 선택 시 아래 ‘고객사 과정 유형’과 위 ‘과목 사용기간’이 필수로 전환됩니다. <b>신규 등록이므로 폐강 선택 불가</b>.</div>
         </td>
       </tr>
       <tr>
@@ -340,7 +343,7 @@
     <ul>
       <li><b>‘콘텐츠라벨’ 항목 추가(조회 전용)</b> — 위치: 기존 <b>‘영문과목명’ 하단 행</b> · 배지로 표기</li>
       <li>콘텐츠라벨이 <b>특정사·고객사자체</b>면 <b>과목 사용기간 · 사용 기업정보</b>도 함께 조회 표기</li>
-      <li>수정 화면에서는 <b>미노출</b> (개별 수정 불가 — 컨텐츠매니지먼트팀 비정형통계로만 수정)</li>
+      <li>수정 정책: <b>콘텐츠라벨만 수정 불가</b>(비정형통계로만) · <b>사용기간·기업정보는 일반 사용자도 수정 가능</b></li>
     </ul>
   </div>
 
@@ -364,14 +367,15 @@
       <tr>
         <td class="lbl is-new">콘텐츠라벨</td>
         <td class="is-new" colspan="3"><span class="badge specific">특정사</span>
-          <span class="hint">조회 전용 · 등록 시 입력된 값 호출</span></td>
+          <span class="chip lock">수정 불가</span>
+          <span class="hint">조회 전용 · 비정형통계로만 수정</span></td>
       </tr>
-      <!-- ▼ 특정사·고객사자체일 때만 조회 표기 ▼ -->
+      <!-- ▼ 특정사·고객사자체일 때만 조회 표기 · 일반 사용자 수정 가능 ▼ -->
       <tr>
         <td class="lbl is-new">과목 사용기간</td>
-        <td class="is-new">2026-01-01 ~ 2026-12-31</td>
+        <td class="is-new">2026-01-01 ~ 2026-12-31 <span class="chip edit">수정 가능</span></td>
         <td class="lbl is-new">사용 기업정보</td>
-        <td class="is-new">일동그룹(1023)</td>
+        <td class="is-new">일동그룹(1023) <span class="chip edit">수정 가능</span></td>
       </tr>
       <tr><td class="lbl">과목구분</td><td colspan="3">온라인</td></tr>
       <tr><td class="lbl">사용과정코드</td><td colspan="3">HLAP32543</td></tr>
@@ -515,10 +519,9 @@
             <option value="general">범용</option>
             <option value="specific">특정사</option>
             <option value="client">고객사자체</option>
-            <option value="closed">폐강</option>
           </select>
           <span id="s5badge"></span>
-          <div class="hint">단과·종합 모두 필수 입력</div>
+          <div class="hint">단과·종합 모두 필수 입력 · <b>신규 등록이므로 폐강 선택 불가</b></div>
         </td>
       </tr>
       <!-- ▼ 특정사/고객사자체일 때만: 과정 사용기간 + 사용 기업 코드 ▼ -->
@@ -562,7 +565,8 @@
     <b>이 화면 변경사항</b> <span class="ref">(기획서 4-3-3 · 4-3-4)</span>
     <ul>
       <li><b>‘콘텐츠라벨’ 항목 추가(조회 전용)</b> — 위치: 기존 <b>‘과정유형’ 하단 행</b> · 배지 표기</li>
-      <li>단과·종합 모두 <b>과정 자체값</b> 호출 · 특정사·고객사자체면 <b>사용기간·기업정보</b>도 표기 · 수정 화면 <b>미노출</b></li>
+      <li>단과·종합 모두 <b>과정 자체값</b> 호출 · 특정사·고객사자체면 <b>사용기간·기업정보</b>도 표기</li>
+      <li>수정 정책: <b>콘텐츠라벨만 수정 불가</b>(비정형통계로만) · <b>사용기간·기업정보는 일반 사용자도 수정 가능</b></li>
     </ul>
   </div>
 
@@ -586,14 +590,15 @@
       <tr>
         <td class="lbl is-new">콘텐츠라벨</td>
         <td class="is-new" colspan="3"><span class="badge client">고객사자체</span>
-          <span class="hint">조회 전용 · 과정 자체 입력값 호출</span></td>
+          <span class="chip lock">수정 불가</span>
+          <span class="hint">조회 전용 · 비정형통계로만 수정</span></td>
       </tr>
-      <!-- ▼ 특정사·고객사자체일 때만 조회 표기 ▼ -->
+      <!-- ▼ 특정사·고객사자체일 때만 조회 표기 · 일반 사용자 수정 가능 ▼ -->
       <tr>
         <td class="lbl is-new">과정 사용기간</td>
-        <td class="is-new">2026-08-28 ~ 2027-08-28</td>
+        <td class="is-new">2026-08-28 ~ 2027-08-28 <span class="chip edit">수정 가능</span></td>
         <td class="lbl is-new">사용 기업정보</td>
-        <td class="is-new">일동그룹(1023)</td>
+        <td class="is-new">일동그룹(1023) <span class="chip edit">수정 가능</span></td>
       </tr>
       <tr><td class="lbl">러닝메이커 과정운영코드</td><td colspan="3">2230</td></tr>
       <tr><td class="lbl">오픈배지 발급여부</td><td colspan="3">N</td></tr>
